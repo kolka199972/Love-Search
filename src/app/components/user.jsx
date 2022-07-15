@@ -12,7 +12,7 @@ const User = ({user, onDelete, ...rest}) => {
       <td>{user.profession.name}</td>
       <td>{user.completedMeetings}</td>
       <td>{user.rate}  /5</td>
-      <td><BookMark status={user.status} id={user._id} {...rest}/></td>
+      <td><BookMark status={user.bookmark} id={user._id} {...rest}/></td>
       <td><button className='btn btn-danger' onClick={() => onDelete(user._id)}>delete</button></td>
     </tr>
   )
