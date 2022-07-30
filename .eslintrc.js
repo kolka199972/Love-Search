@@ -14,6 +14,8 @@ module.exports = {
   plugins: ['react'],
   rules: {
     'object-curly-spacing': 'off',
-    'space-before-function-paren': 'off'
+    'space-before-function-paren': 'off',
+    'multiline-ternary': 'off',
+    indent: 'off'
   }
 }
