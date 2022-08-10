@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import {paginate} from '../utils/paginate'
-import Pagination from './pagination'
-import GroupList from './groupList'
+import Pagination from '../components/pagination'
+import GroupList from '../components/groupList'
 import api from '../api/index'
-import SearchStatus from './searchStatus'
-import UsersTable from './usersTable'
+import SearchStatus from '../components/searchStatus'
+import UsersTable from '../components/usersTable'
 import _ from 'lodash'
 
 const Users = () => {
-  const pageSize = 4
+  const pageSize = 6
 
   const [users, setUsers] = useState()
 
