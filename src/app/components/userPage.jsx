@@ -4,7 +4,7 @@ import QualitiesList from './qualitiesList'
 import API from '../api'
 import {useHistory, useParams} from 'react-router-dom'
 
-const User = () => {
+const UserPage = () => {
   const [user, setUser] = useState(null)
   const {userId} = useParams()
   const history = useHistory()
@@ -22,7 +22,7 @@ const User = () => {
           <h2>Профессия: {user.profession.name}</h2>
           <QualitiesList qualities={user.qualities} />
           <p>Completed meetings: {user.completedMeetings}</p>
-          <h1>Rate: {user.rate}</h1>
+          <h2>Rate: {user.rate}</h2>
           <button onClick={handleMoveToList}>Все пользователи</button>
         </>
       ) : (
@@ -32,8 +32,8 @@ const User = () => {
   )
 }
 
-export default User
+export default UserPage
 
-User.propTypes = {
+UserPage.propTypes = {
   user: PropTypes.object
 }
