@@ -8,6 +8,12 @@ import UsersTable from './usersTable'
 import _ from 'lodash'
 
 const UsersList = () => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [professions, setProfessions] = useState()
+  const [selectedProf, setSelectedProf] = useState()
+  const [sortBy, setSortBy] = useState({path: 'name', order: 'asc'})
+  const [searchValue, setSearchValue] = useState('')
+
   const pageSize = 6
 
   const [users, setUsers] = useState()
@@ -15,10 +21,6 @@ const UsersList = () => {
   useEffect(() => {
     api.users.fetchAll().then((response) => setUsers(response))
   }, [])
-
-  useEffect(() => {
-    setSearchedUsers(users)
-  }, [users])
 
   const handleDelete = (userId) => {
     setUsers(users.filter((user) => user._id !== userId))
@@ -35,13 +37,6 @@ const UsersList = () => {
     )
   }
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const [professions, setProfessions] = useState()
-  const [selectedProf, setSelectedProf] = useState()
-  const [sortBy, setSortBy] = useState({path: 'name', order: 'asc'})
-  const [searchedUsers, setSearchedUsers] = useState(users)
-  const [searchValue, setSearchValue] = useState('')
-
   useEffect(() => {
     api.professions.fetchAll().then((data) => setProfessions(data))
   }, [])
@@ -50,43 +45,43 @@ const UsersList = () => {
     setCurrentPage(1)
   }, [selectedProf, searchValue])
 
-  if (searchedUsers) {
-    const filteredUsers = selectedProf
-      ? searchedUsers.filter(
+  const handleProfessionSelect = (item) => {
+    setSelectedProf(item)
+    if (searchValue !== '') setSearchValue('')
+  }
+
+  const changeSearchValue = ({target}) => {
+    const value = target.value
+    setSearchValue(value)
+    setSelectedProf(undefined)
+  }
+
+  const handlePageChange = (pageIndex) => {
+    setCurrentPage(pageIndex)
+  }
+
+  const handleSort = (item) => {
+    setSortBy(item)
+  }
+
+  if (users) {
+    const filteredUsers = searchValue
+      ? users.filter(
+          (user) =>
+            user.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+        )
+      : selectedProf
+      ? users.filter(
           (user) =>
             JSON.stringify(user.profession) === JSON.stringify(selectedProf)
         )
-      : searchedUsers
+      : users
     const count = filteredUsers.length
     const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order])
     const userCrop = paginate(sortedUsers, currentPage, pageSize)
 
-    const handleProfessionSelect = (item) => {
-      setSelectedProf(item)
-      setSearchValue('')
-      setSearchedUsers(users)
-    }
-
-    const handlePageChange = (pageIndex) => {
-      setCurrentPage(pageIndex)
-    }
-
     const clearFilter = () => {
       setSelectedProf()
-    }
-
-    const handleSort = (item) => {
-      setSortBy(item)
-    }
-
-    const changeSearchValue = ({target}) => {
-      const value = target.value
-      setSearchValue(value)
-      setSearchedUsers(
-        users.filter((user) =>
-          user.name.toLowerCase().includes(value.toLowerCase())
-        )
-      )
     }
 
     return (
@@ -111,6 +106,7 @@ const UsersList = () => {
             value={searchValue}
             onChange={changeSearchValue}
             placeholder='Search...'
+            name='searchValue'
           />
 
           {count > 0 && (
