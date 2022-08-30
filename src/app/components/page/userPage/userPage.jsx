@@ -12,7 +12,7 @@ const UserPage = () => {
     API.users.getById(userId).then((response) => setUser(response))
   }, [userId])
   const handleMoveToList = () => {
-    history.push('/users')
+    history.push(`/users/${userId}/edit`)
   }
   return (
     <div>
@@ -23,7 +23,7 @@ const UserPage = () => {
           <Qualities qualities={user.qualities} />
           <p>Completed meetings: {user.completedMeetings}</p>
           <h2>Rate: {user.rate}</h2>
-          <button onClick={handleMoveToList}>Все пользователи</button>
+          <button onClick={handleMoveToList}>Изменить</button>
         </>
       ) : (
         <h1>Loading</h1>

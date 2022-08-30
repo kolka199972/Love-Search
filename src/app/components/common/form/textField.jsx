@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
-const TextField = ({label, name, type, value, handleChange, error}) => {
+const TextField = ({label, name, type, value, onChange, error}) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const toggleShowPassword = () => {
@@ -10,6 +10,13 @@ const TextField = ({label, name, type, value, handleChange, error}) => {
 
   const getInputClasses = () => {
     return `form-control ${error ? 'is-invalid' : ''}`
+  }
+
+  const handleChange = ({target}) => {
+    onChange({
+      name: target.name,
+      value: target.value
+    })
   }
 
   return (
@@ -48,7 +55,7 @@ TextField.propTypes = {
   name: PropTypes.string,
   type: PropTypes.string,
   value: PropTypes.string,
-  handleChange: PropTypes.func,
+  onChange: PropTypes.func,
   error: PropTypes.string
 }
 
