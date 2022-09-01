@@ -8,7 +8,14 @@ import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 
 const EditUserPage = () => {
-  const [data, setData] = useState()
+  const [data, setData] = useState({
+    name: '',
+    email: '',
+    profession: '',
+    sex: 'male',
+    qualities: []
+  })
+  const [isLoading, setIsLoading] = useState(false)
   const [professions, setProfessions] = useState([])
   const [qualities, setQualities] = useState([])
   const [errors, setErrors] = useState({})
@@ -47,18 +54,18 @@ const EditUserPage = () => {
   }, [data])
 
   useEffect(() => {
-    api.users.getById(userId).then((data) =>
-      setData({
-        name: data.name,
-        email: data.email,
-        profession: data.profession._id,
-        qualities: data.qualities.map((q) => ({
+    setIsLoading(true)
+    api.users.getById(userId).then(({profession, qualities, ...data}) =>
+      setData((prevState) => ({
+        ...prevState,
+        ...data,
+        qualities: qualities.map((q) => ({
           label: q.name,
           value: q._id,
           color: q.color
         })),
-        sex: data.sex
-      })
+        profession: profession._id
+      }))
     )
     api.professions.fetchAll().then((data) =>
       setProfessions(
@@ -78,14 +85,21 @@ const EditUserPage = () => {
     })
   }, [])
 
+  useEffect(() => {
+    if (data._id) setIsLoading(false)
+  }, [data])
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    api.users.update(userId, {
-      ...data,
-      profession: getProfessionById(data.profession),
-      qualities: getQualities(data.qualities)
-    })
-    history.push(`/users/${userId}`)
+    const isValid = validate()
+    if (!isValid) return
+    api.users
+      .update(userId, {
+        ...data,
+        profession: getProfessionById(data.profession),
+        qualities: getQualities(data.qualities)
+      })
+      .then(() => history.push(`/users/${userId}`))
   }
 
   const handleChange = (target) => {
@@ -125,7 +139,7 @@ const EditUserPage = () => {
     <div className='container mt-5'>
       <div className='row'>
         <div className='col-md-6 offset-md-3 shadow p-4'>
-          {data ? (
+          {!isLoading && Object.keys(professions).length > 0 ? (
             <form action='' onSubmit={handleSubmit}>
               <TextField
                 label='Имя'
