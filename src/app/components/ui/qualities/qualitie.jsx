@@ -1,13 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {useQuality} from '../../../hooks/useQuality'
 
-const Qualitie = ({color, name}) => {
-  return <span className={'m-1 badge bg-' + color}>{name}</span>
+const Qualitie = ({id}) => {
+  const {getQualityById, isLoading} = useQuality()
+  const quality = getQualityById(id)
+
+  return isLoading ? (
+    'Loading...'
+  ) : (
+    <span className={'m-1 badge bg-' + quality.color}>{quality.name}</span>
+  )
 }
 
 Qualitie.propTypes = {
-  color: PropTypes.string,
-  name: PropTypes.string
+  id: PropTypes.string
 }
 
 export default Qualitie

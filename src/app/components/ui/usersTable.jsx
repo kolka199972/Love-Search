@@ -4,6 +4,7 @@ import BookMark from '../common/bookmark'
 import Qualities from './qualities'
 import Table from '../common/table'
 import {Link} from 'react-router-dom'
+import Professions from './professions'
 
 const UsersTable = ({
   users,
@@ -22,7 +23,10 @@ const UsersTable = ({
       name: 'Качества',
       component: (user) => <Qualities qualities={user.qualities} />
     },
-    professions: {path: 'profession.name', name: 'Профессия'},
+    professions: {
+      component: (user) => <Professions id={user.profession} />,
+      name: 'Профессия'
+    },
     completedMeetings: {path: 'completedMeetings', name: 'Встретился, раз'},
     rate: {path: 'rate', name: 'Оценка'},
     bookmark: {

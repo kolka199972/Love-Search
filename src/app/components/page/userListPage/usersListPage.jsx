@@ -6,6 +6,7 @@ import {paginate} from '../../../utils/paginate'
 import SearchStatus from '../../ui/searchStatus'
 import UsersTable from '../../ui/usersTable'
 import Pagination from '../../common/pagination'
+import {useUser} from '../../../hooks/useUser'
 
 const UsersListPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -16,25 +17,21 @@ const UsersListPage = () => {
 
   const pageSize = 6
 
-  const [users, setUsers] = useState()
-
-  useEffect(() => {
-    api.users.fetchAll().then((response) => setUsers(response))
-  }, [])
+  const {users} = useUser()
 
   const handleDelete = (userId) => {
-    setUsers(users.filter((user) => user._id !== userId))
+    // setUsers(users.filter((user) => user._id !== userId))
+    console.log(userId)
   }
 
   const handleToggleBookMark = (id) => {
-    setUsers(
-      users.map((user) => {
-        if (user._id === id) {
-          return {...user, bookmark: !user.bookmark}
-        }
-        return user
-      })
-    )
+    const newArray = users.map((user) => {
+      if (user._id === id) {
+        return {...user, bookmark: !user.bookmark}
+      }
+      return user
+    })
+    console.log(newArray)
   }
 
   useEffect(() => {
