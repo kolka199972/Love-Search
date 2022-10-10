@@ -1,11 +1,40 @@
 import axios from 'axios'
 import {toast} from 'react-toastify'
-import config from '../config.json'
+import configFile from '../config.json'
 
-axios.defaults.baseURL = config.apiEndPoint
+function transformData(data) {
+  return data
+    ? Object.keys(data).map((v) => {
+        return {...data[v]}
+      })
+    : []
+}
 
-axios.interceptors.request.use(
-  (res) => res,
+const http = axios.create({
+  baseURL: configFile.apiEndPoint
+})
+
+http.interceptors.request.use(
+  (config) => {
+    if (configFile.isFireBase) {
+      const containSlash = /\/$/gi.test(config.url)
+      config.url =
+        (containSlash ? config.url.slice(0, -1) : config.url) + '.json'
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+http.interceptors.response.use(
+  (res) => {
+    if (configFile.isFireBase) {
+      res.data = {content: transformData(res.data)}
+    }
+    return res
+  },
   (err) => {
     const expectedError =
       err.response && err.response.status >= 400 && err.response.status < 500
@@ -18,10 +47,10 @@ axios.interceptors.request.use(
 )
 
 const httpService = {
-  get: axios.get,
-  delete: axios.delete,
-  post: axios.post,
-  put: axios.put
+  get: http.get,
+  delete: http.delete,
+  post: http.post,
+  put: http.put
 }
 
 export default httpService

@@ -31,8 +31,6 @@ const QualityProvider = ({children}) => {
   }
 
   const getQualityById = (id) => {
-    console.log(id)
-    console.log(qualities)
     return qualities.find((q) => q._id === id)
   }
 
@@ -47,7 +45,7 @@ const QualityProvider = ({children}) => {
   }
 
   return (
-    <QualityContext.Provider value={{isLoading, getQualityById}}>
+    <QualityContext.Provider value={{isLoading, getQualityById, qualities}}>
       {children}
     </QualityContext.Provider>
   )

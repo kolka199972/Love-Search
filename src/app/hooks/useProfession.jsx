@@ -45,7 +45,9 @@ const ProfessionProvider = ({children}) => {
   }
 
   return (
-    <ProfessionContext.Provider value={{isLoading, getProfessionById}}>
+    <ProfessionContext.Provider
+      value={{isLoading, getProfessionById, professions}}
+    >
       {children}
     </ProfessionContext.Provider>
   )
