@@ -7,9 +7,10 @@ import TextField from '../common/form/textField'
 
 const LoginForm = () => {
   const history = useHistory()
-  const {signIn} = useAuth()
+  const {logIn} = useAuth()
   const [data, setData] = useState({email: '', password: '', stayOn: false})
   const [errors, setErrors] = useState({})
+  const [enterError, setEnterError] = useState(null)
 
   const validatorConfig = {
     email: {
@@ -41,6 +42,7 @@ const LoginForm = () => {
     setData((prevState) => {
       return {...prevState, [target.name]: target.value}
     })
+    setEnterError(null)
   }
 
   useEffect(() => {
@@ -61,10 +63,10 @@ const LoginForm = () => {
     if (!isValid) return
     try {
       console.log(data)
-      await signIn(data)
+      await logIn(data)
       history.push('/')
-    } catch (e) {
-      setErrors(e)
+    } catch (error) {
+      setEnterError(error.message)
     }
   }
 
@@ -89,10 +91,11 @@ const LoginForm = () => {
       <CheckBoxField name='stayOn' value={data.stayOn} onChange={handleChange}>
         Оставаться в системе
       </CheckBoxField>
+      {enterError && <p className='text-danger'>{enterError}</p>}
       <button
         className='btn btn-primary w-100 mx-auto'
         type='submit'
-        disabled={!isValid}
+        disabled={!isValid || enterError}
       >
         Submit
       </button>

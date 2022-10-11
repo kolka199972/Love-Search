@@ -3,11 +3,11 @@ import {toast} from 'react-toastify'
 import configFile from '../config.json'
 
 function transformData(data) {
-  return data
+  return data && !data._id
     ? Object.keys(data).map((v) => {
         return {...data[v]}
       })
-    : []
+    : data
 }
 
 const http = axios.create({
