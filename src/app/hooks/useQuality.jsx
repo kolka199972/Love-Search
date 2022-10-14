@@ -38,9 +38,10 @@ const QualityProvider = ({children}) => {
     try {
       const {content} = await qualityService.get()
       setQualities(content)
-      setIsLoading(false)
     } catch (e) {
       errorCatcher(e)
+    } finally {
+      setIsLoading(false)
     }
   }
 

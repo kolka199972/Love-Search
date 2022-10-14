@@ -1,25 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import SelectField from '../form/selectField'
-import API from '../../../api'
 import TextariaField from '../form/textariaField'
 import {validator} from '../../../utils/validator'
 
 const AddCommentForm = ({onSubmit}) => {
-  const [data, setData] = useState({userId: '', content: ''})
-  const [users, setUsers] = useState([])
+  const [data, setData] = useState({})
   const [errors, setErrors] = useState({})
 
-  useEffect(() => {
-    API.users.fetchAll().then((response) => setUsers(response))
-  })
-
   const validatorConfig = {
-    userId: {
-      isRequired: {
-        message: 'Пользователь не выбран'
-      }
-    },
     content: {
       isRequired: {
         message: 'Сообщение должно быть заполнено'
@@ -49,41 +37,29 @@ const AddCommentForm = ({onSubmit}) => {
     })
   }
 
+  const clearForm = () => {
+    setData({})
+    setErrors({})
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const isValid = validate()
     if (!isValid) return
     onSubmit(data)
-    setData({userId: '', content: ''})
-    setErrors({})
+    clearForm()
   }
-
-  const optionsOfUsers = users.map((user) => {
-    return {
-      label: user.name,
-      value: user._id
-    }
-  })
 
   return (
     <div className='card-body'>
       <div>
         <h2>New comment</h2>
         <form onSubmit={handleSubmit}>
-          <SelectField
-            value={data.userId}
-            defaultOption='Выберите пользователя'
-            options={optionsOfUsers}
-            onChange={handleChange}
-            name='userId'
-            error={errors.userId}
-          />
-
           <TextariaField
             rows='3'
             label='Сообщение'
             name='content'
-            value={data.content}
+            value={data.content || ''}
             onChange={handleChange}
             error={errors.content}
           />

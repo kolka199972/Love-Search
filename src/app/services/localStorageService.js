@@ -11,6 +11,13 @@ export const setTokens = ({idToken, refreshToken, localId, expiresIn}) => {
   localStorage.setItem(USERID_KEY, localId)
 }
 
+export const removeAuthData = () => {
+  localStorage.removeItem(TOKEN_ID)
+  localStorage.removeItem(REFRESH_TOKEN)
+  localStorage.removeItem(EXPIRES_TOKEN)
+  localStorage.removeItem(USERID_KEY)
+}
+
 export const getAccessToken = () => {
   return localStorage.getItem(TOKEN_ID)
 }
@@ -32,7 +39,8 @@ const localStorageService = {
   getAccessToken,
   getRefreshToken,
   getExpiresToken,
-  getUserId
+  getUserId,
+  removeAuthData
 }
 
 export default localStorageService

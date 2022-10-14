@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import api from '../../../api'
 import _ from 'lodash'
 import GroupList from '../../common/groupList'
 import {paginate} from '../../../utils/paginate'
@@ -7,13 +6,17 @@ import SearchStatus from '../../ui/searchStatus'
 import UsersTable from '../../ui/usersTable'
 import Pagination from '../../common/pagination'
 import {useUser} from '../../../hooks/useUser'
+import {useProfession} from '../../../hooks/useProfession'
+import {useAuth} from '../../../hooks/useAuth'
 
 const UsersListPage = () => {
+  const {isLoading: professionsLoading, professions} = useProfession()
   const [currentPage, setCurrentPage] = useState(1)
-  const [professions, setProfessions] = useState()
   const [selectedProf, setSelectedProf] = useState()
   const [sortBy, setSortBy] = useState({path: 'name', order: 'asc'})
   const [searchValue, setSearchValue] = useState('')
+
+  const {currentUser} = useAuth()
 
   const pageSize = 6
 
@@ -33,10 +36,6 @@ const UsersListPage = () => {
     })
     console.log(newArray)
   }
-
-  useEffect(() => {
-    api.professions.fetchAll().then((data) => setProfessions(data))
-  }, [])
 
   useEffect(() => {
     setCurrentPage(1)
@@ -62,17 +61,21 @@ const UsersListPage = () => {
   }
 
   if (users) {
-    const filteredUsers = searchValue
-      ? users.filter(
-          (user) =>
-            user.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
-        )
-      : selectedProf
-      ? users.filter(
-          (user) =>
-            JSON.stringify(user.profession) === JSON.stringify(selectedProf)
-        )
-      : users
+    const filterUsers = (data) => {
+      const filteredUsers = searchValue
+        ? data.filter(
+            (user) =>
+              user.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+          )
+        : selectedProf
+        ? data.filter(
+            (user) =>
+              JSON.stringify(user.profession) === JSON.stringify(selectedProf)
+          )
+        : data
+      return filteredUsers.filter((u) => u._id !== currentUser._id)
+    }
+    const filteredUsers = filterUsers(users)
     const count = filteredUsers.length
     const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order])
     const userCrop = paginate(sortedUsers, currentPage, pageSize)
@@ -83,7 +86,7 @@ const UsersListPage = () => {
 
     return (
       <div className='d-flex'>
-        {professions && (
+        {professions && !professionsLoading && (
           <div className='d-flex flex-column flex-shrink-0 p-3'>
             <GroupList
               items={professions}

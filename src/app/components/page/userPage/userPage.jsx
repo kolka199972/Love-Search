@@ -1,19 +1,17 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import API from '../../../api'
 import {useParams} from 'react-router-dom'
 import Comments from '../../ui/comments'
 import UserCard from '../../ui/userCard'
 import QualitiesCard from '../../ui/qualitiesCard'
 import MeetingsCard from '../../ui/meetingsCard'
+import {useUser} from '../../../hooks/useUser'
+import CommentProvider from '../../../hooks/useComment'
 
 const UserPage = () => {
-  const [user, setUser] = useState()
   const {userId} = useParams()
-
-  useEffect(() => {
-    API.users.getById(userId).then((response) => setUser(response))
-  }, [userId])
+  const {getUserById} = useUser()
+  const user = getUserById(userId)
 
   return (
     <div>
@@ -27,7 +25,9 @@ const UserPage = () => {
             </div>
 
             <div className='col-md-8'>
-              <Comments />
+              <CommentProvider>
+                <Comments />
+              </CommentProvider>
             </div>
           </div>
         </div>

@@ -4,8 +4,9 @@ import axios from 'axios'
 import {toast} from 'react-toastify'
 import userService from '../services/userService'
 import localStorageService, {setTokens} from '../services/localStorageService'
+import {useHistory} from 'react-router-dom'
 
-const httpAuth = axios.create({
+export const httpAuth = axios.create({
   baseURL: 'https://identitytoolkit.googleapis.com/v1/',
   params: {
     key: process.env.REACT_APP_FIREBASE_KEY
@@ -21,6 +22,9 @@ export const useAuth = () => {
 const AuthProvider = ({children}) => {
   const [currentUser, setCurrentUser] = useState()
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  const history = useHistory()
 
   useEffect(() => {
     if (error !== null) {
@@ -32,8 +36,10 @@ const AuthProvider = ({children}) => {
   useEffect(() => {
     if (localStorageService.getAccessToken()) {
       getUserData()
+    } else {
+      setLoading(false)
     }
-  })
+  }, [])
 
   const errorCatcher = (error) => {
     const {message} = error.response.data
@@ -60,6 +66,8 @@ const AuthProvider = ({children}) => {
       setCurrentUser(content)
     } catch (e) {
       errorCatcher(e)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -76,6 +84,9 @@ const AuthProvider = ({children}) => {
         rate: randomInt(0, 5),
         completedMeetings: randomInt(0, 200),
         email,
+        image: `https://avatars.dicebear.com/api/avataaars/${(Math.random() + 1)
+          .toString(36)
+          .substring(7)}.svg`,
         ...rest
       })
     } catch (e) {
@@ -89,7 +100,6 @@ const AuthProvider = ({children}) => {
           throw errorObject
         }
       }
-      throw new Error()
     }
   }
 
@@ -101,7 +111,7 @@ const AuthProvider = ({children}) => {
         returnSecureToken: true
       })
       setTokens(data)
-      getUserData()
+      await getUserData()
     } catch (e) {
       errorCatcher(e)
       const {code, message} = e.response.data.error
@@ -113,13 +123,29 @@ const AuthProvider = ({children}) => {
             throw new Error('Слишком много попыток, попробуйте позже')
         }
       }
-      throw new Error()
+    }
+  }
+
+  const logOut = () => {
+    localStorageService.removeAuthData()
+    setCurrentUser(null)
+    history.push('/')
+  }
+
+  const updateUserData = async (data) => {
+    try {
+      const {content} = await userService.create(data)
+      setCurrentUser(content)
+    } catch (e) {
+      errorCatcher(e)
     }
   }
 
   return (
-    <AuthContext.Provider value={{signUp, logIn, currentUser}}>
-      {children}
+    <AuthContext.Provider
+      value={{signUp, logIn, logOut, updateUserData, currentUser}}
+    >
+      {!loading ? children : 'Loading...'}
     </AuthContext.Provider>
   )
 }
