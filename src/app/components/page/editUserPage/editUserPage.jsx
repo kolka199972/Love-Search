@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {useHistory, useParams} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
 import TextField from '../../common/form/textField'
 import {validator} from '../../../utils/validator'
 import SelectField from '../../common/form/selectField'
@@ -8,17 +8,10 @@ import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backHistoryButton'
 import {useProfession} from '../../../hooks/useProfession'
 import {useQuality} from '../../../hooks/useQuality'
-import {useUser} from '../../../hooks/useUser'
 import {useAuth} from '../../../hooks/useAuth'
 
 const EditUserPage = () => {
-  const [data, setData] = useState({
-    name: '',
-    email: '',
-    profession: '',
-    sex: 'male',
-    qualities: []
-  })
+  const [data, setData] = useState()
   const {professions, isLoading: professionLoading} = useProfession()
   const professionsList = professions.map((p) => {
     return {
@@ -33,11 +26,9 @@ const EditUserPage = () => {
       label: q.name
     }
   })
-  const {getUserById} = useUser()
   const {currentUser, updateUserData} = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState({})
-  const {userId} = useParams()
   const history = useHistory()
 
   const validatorConfig = {
@@ -72,31 +63,24 @@ const EditUserPage = () => {
   }, [data])
 
   useEffect(() => {
-    setIsLoading(true)
-    if (currentUser._id !== userId) {
-      history.push(`/users/${currentUser._id}/edit`)
-    }
-    if (!qualityLoading && !professionLoading) {
-      const user = getUserById(userId)
-      const nq = user.qualities.map((q) => getQualityById(q))
-      console.log(nq)
-      console.log(user)
-      setData((prevState) => ({
-        ...prevState,
-        ...user,
-        qualities: user.qualities
+    if (!qualityLoading && !professionLoading && currentUser && !data) {
+      setData({
+        ...currentUser,
+        qualities: currentUser.qualities
           .map((q) => getQualityById(q))
           .map((q) => ({
             label: q.name,
             value: q._id,
             color: q.color
           }))
-      }))
+      })
     }
-  }, [qualityLoading, professionLoading, userId])
+  }, [qualityLoading, professionLoading, currentUser])
 
   useEffect(() => {
-    if (data._id) setIsLoading(false)
+    if (data && isLoading) {
+      setIsLoading(false)
+    }
   }, [data])
 
   const handleSubmit = async (e) => {
@@ -109,7 +93,7 @@ const EditUserPage = () => {
     }
     try {
       await updateUserData(newData)
-      history.push(`/users/${userId}`)
+      history.push(`/users/${currentUser._id}`)
     } catch (error) {
       setErrors(error)
     }
