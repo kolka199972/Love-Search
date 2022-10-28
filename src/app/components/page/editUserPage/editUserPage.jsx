@@ -6,20 +6,26 @@ import SelectField from '../../common/form/selectField'
 import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backHistoryButton'
-import {useProfession} from '../../../hooks/useProfession'
-import {useQuality} from '../../../hooks/useQuality'
 import {useAuth} from '../../../hooks/useAuth'
+import {useSelector} from 'react-redux'
+import {getQualities, getQualitiesLoadingStatus} from '../../../store/qualities'
+import {
+  getProfessions,
+  getProfessionsLoadingStatus
+} from '../../../store/professions'
 
 const EditUserPage = () => {
   const [data, setData] = useState()
-  const {professions, isLoading: professionLoading} = useProfession()
+  const professions = useSelector(getProfessions())
+  const professionLoading = useSelector(getProfessionsLoadingStatus())
   const professionsList = professions.map((p) => {
     return {
       value: p._id,
       label: p.name
     }
   })
-  const {qualities, getQualityById, isLoading: qualityLoading} = useQuality()
+  const qualities = useSelector(getQualities())
+  const qualityLoading = useSelector(getQualitiesLoadingStatus())
   const qualitiesList = qualities.map((q) => {
     return {
       value: q._id,
@@ -67,7 +73,7 @@ const EditUserPage = () => {
       setData({
         ...currentUser,
         qualities: currentUser.qualities
-          .map((q) => getQualityById(q))
+          .map((id) => qualities.find((q) => q._id === id))
           .map((q) => ({
             label: q.name,
             value: q._id,
