@@ -1,20 +1,22 @@
 import React, {useEffect, useState} from 'react'
-import {useHistory} from 'react-router-dom'
+// import {useHistory} from 'react-router-dom'
 import TextField from '../../common/form/textField'
 import {validator} from '../../../utils/validator'
 import SelectField from '../../common/form/selectField'
 import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backHistoryButton'
-import {useAuth} from '../../../hooks/useAuth'
-import {useSelector} from 'react-redux'
+// import {useAuth} from '../../../hooks/useAuth'
+import {useDispatch, useSelector} from 'react-redux'
 import {getQualities, getQualitiesLoadingStatus} from '../../../store/qualities'
 import {
   getProfessions,
   getProfessionsLoadingStatus
 } from '../../../store/professions'
+import {getCurrentUserData, updateUserData} from '../../../store/users'
 
 const EditUserPage = () => {
+  const dispatch = useDispatch()
   const [data, setData] = useState()
   const professions = useSelector(getProfessions())
   const professionLoading = useSelector(getProfessionsLoadingStatus())
@@ -32,10 +34,11 @@ const EditUserPage = () => {
       label: q.name
     }
   })
-  const {currentUser, updateUserData} = useAuth()
+  const currentUser = useSelector(getCurrentUserData())
+  // const {updateUserData} = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState({})
-  const history = useHistory()
+  // const history = useHistory()
 
   const validatorConfig = {
     name: {
@@ -89,7 +92,7 @@ const EditUserPage = () => {
     }
   }, [data])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     const isValid = validate()
     if (!isValid) return
@@ -97,12 +100,13 @@ const EditUserPage = () => {
       ...data,
       qualities: data.qualities.map((q) => q.value)
     }
-    try {
-      await updateUserData(newData)
-      history.push(`/users/${currentUser._id}`)
-    } catch (error) {
-      setErrors(error)
-    }
+    dispatch(updateUserData(newData))
+    // try {
+    //   await updateUserData(newData)
+    //   history.push(`/users/${currentUser._id}`)
+    // } catch (error) {
+    //   setErrors(error)
+    // }
   }
 
   const handleChange = (target) => {
