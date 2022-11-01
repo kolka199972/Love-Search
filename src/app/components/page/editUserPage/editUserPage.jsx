@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from 'react'
-// import {useHistory} from 'react-router-dom'
 import TextField from '../../common/form/textField'
 import {validator} from '../../../utils/validator'
 import SelectField from '../../common/form/selectField'
 import RadioField from '../../common/form/radioField'
 import MultiSelectField from '../../common/form/multiSelectField'
 import BackHistoryButton from '../../common/backHistoryButton'
-// import {useAuth} from '../../../hooks/useAuth'
 import {useDispatch, useSelector} from 'react-redux'
 import {getQualities, getQualitiesLoadingStatus} from '../../../store/qualities'
 import {
@@ -35,10 +33,8 @@ const EditUserPage = () => {
     }
   })
   const currentUser = useSelector(getCurrentUserData())
-  // const {updateUserData} = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState({})
-  // const history = useHistory()
 
   const validatorConfig = {
     name: {
