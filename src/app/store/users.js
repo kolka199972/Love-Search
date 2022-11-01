@@ -2,6 +2,7 @@ import {createAction, createSlice} from '@reduxjs/toolkit'
 import authService from '../services/authService'
 import localStorageService from '../services/localStorageService'
 import userService from '../services/userService'
+import {generateAuthError} from '../utils/generateAuthError'
 import history from '../utils/history'
 import {randomInt} from '../utils/randomInt'
 
@@ -58,13 +59,13 @@ const usersSlice = createSlice({
       state.auth = null
       state.dataLoaded = false
     },
-    userDataUpdated(state, action) {
-      state.entities = state.entities.map((u) => {
-        if (u._id === action.payload._id) {
-          return action.payload
-        }
-        return u
-      })
+    userUpdateSuccessed(state, action) {
+      state.entities[
+        state.entities.findIndex((u) => u._id === action.payload._id)
+      ] = action.payload
+    },
+    authRequested(state) {
+      state.error = null
     }
   }
 })
@@ -78,12 +79,13 @@ const {
   authRequestFailed,
   userCreated,
   userLoggedOut,
-  userDataUpdated
+  userUpdateSuccessed,
+  authRequested
 } = actions
-const authRequested = createAction('users/authRequested')
 const userCreateRequested = createAction('users/userCreateRequested')
 const createUserFailed = createAction('users/createUserFailed')
-const userDataUpdateFailed = createAction('users/userDataUpdateFailed')
+const userUpdateFailed = createAction('users/userUpdateFailed')
+const userUpdateRequested = createAction('users/userUpdateRequested')
 
 const createUser = (payload) => async (dispatch) => {
   dispatch(userCreateRequested())
@@ -107,12 +109,13 @@ export const loadUsersList = () => async (dispatch) => {
 }
 
 export const updateUserData = (payload) => async (dispatch) => {
+  dispatch(userUpdateRequested())
   try {
     const {content} = await userService.update(payload)
-    dispatch(userDataUpdated(content))
+    dispatch(userUpdateSuccessed(content))
     history.push(`/users/${content._id}`)
   } catch (error) {
-    dispatch(userDataUpdateFailed(error.message))
+    dispatch(userUpdateFailed(error.message))
   }
 }
 
@@ -154,7 +157,13 @@ export const login =
       localStorageService.setTokens(data)
       history.push(redirect)
     } catch (error) {
-      dispatch(authRequestFailed(error.message))
+      const {code, message} = error.response.data.error
+      if (code === 400) {
+        const errorMessage = generateAuthError(message)
+        dispatch(authRequestFailed(errorMessage))
+      } else {
+        dispatch(authRequestFailed(error.message))
+      }
     }
   }
 
@@ -179,5 +188,6 @@ export const getCurrentUserData = () => (state) => {
     : null
 }
 export const getUsersLoadingStatus = () => (state) => state.users.isLoading
+export const getAuthErrors = () => (state) => state.users.error
 
 export default usersReducer

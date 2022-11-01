@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import {useHistory} from 'react-router-dom'
-import {login} from '../../store/users'
+import {getAuthErrors, login} from '../../store/users'
 import {validator} from '../../utils/validator'
 import CheckBoxField from '../common/form/checkBoxField'
 import TextField from '../common/form/textField'
@@ -11,7 +11,7 @@ const LoginForm = () => {
   const history = useHistory()
   const [data, setData] = useState({email: '', password: '', stayOn: false})
   const [errors, setErrors] = useState({})
-  const [enterError, setEnterError] = useState(null)
+  const loginError = useSelector(getAuthErrors())
 
   const validatorConfig = {
     email: {
@@ -43,7 +43,6 @@ const LoginForm = () => {
     setData((prevState) => {
       return {...prevState, [target.name]: target.value}
     })
-    setEnterError(null)
   }
 
   useEffect(() => {
@@ -89,11 +88,11 @@ const LoginForm = () => {
       <CheckBoxField name='stayOn' value={data.stayOn} onChange={handleChange}>
         Оставаться в системе
       </CheckBoxField>
-      {enterError && <p className='text-danger'>{enterError}</p>}
+      {loginError && <p className='text-danger'>{loginError}</p>}
       <button
         className='btn btn-primary w-100 mx-auto'
         type='submit'
-        disabled={!isValid || enterError}
+        disabled={!isValid}
       >
         Submit
       </button>
