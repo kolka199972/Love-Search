@@ -1,0 +1,6 @@
+{
+  "port": 8080,
+  "mongoUri": "mongodb://ukfuukqvsadb8camdvth:G7hdFLeGnxzyMk0gWlaO@n1-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017,n2-c2-mongodb-clevercloud-customers.services.clever-cloud.com:27017/b4og0ze8fkyoasy?replicaSet=rs0",
+  "accessSecret": "kolka secret 72",
+  "refreshSecret": "kolka secret 72 new"
+}

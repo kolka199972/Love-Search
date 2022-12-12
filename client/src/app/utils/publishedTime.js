@@ -1,23 +1,23 @@
 export const publishedTime = (created) => {
-  const year = new Date(+created).getFullYear()
+  const year = new Date(created).getFullYear()
   const month =
-    new Date(+created).getMonth() + 1 < 10
-      ? '0' + (new Date(+created).getMonth() + 1)
-      : new Date(+created).getMonth() + 1
+    new Date(created).getMonth() + 1 < 10
+      ? '0' + (new Date(created).getMonth() + 1)
+      : new Date(created).getMonth() + 1
   const day =
-    new Date(+created).getDate() < 10
-      ? '0' + new Date(+created).getDate()
-      : new Date(+created).getDate()
+    new Date(created).getDate() < 10
+      ? '0' + new Date(created).getDate()
+      : new Date(created).getDate()
   const hours =
-    new Date(+created).getHours() < 10
-      ? '0' + new Date(+created).getHours()
-      : new Date(+created).getHours()
+    new Date(created).getHours() < 10
+      ? '0' + new Date(created).getHours()
+      : new Date(created).getHours()
   const minutes =
-    new Date(+created).getMinutes() < 10
-      ? '0' + new Date(+created).getMinutes()
-      : new Date(+created).getMinutes()
+    new Date(created).getMinutes() < 10
+      ? '0' + new Date(created).getMinutes()
+      : new Date(created).getMinutes()
 
-  const passedTime = new Date() - new Date(+created)
+  const passedTime = new Date() - new Date(created)
   if (passedTime >= 3.154e10) {
     return `${day}.${month}.${year}`
   } else if (passedTime >= 8.64e7) {

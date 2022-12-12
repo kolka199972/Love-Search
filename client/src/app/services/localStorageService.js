@@ -3,12 +3,12 @@ const REFRESH_TOKEN = 'jwt-refresh-token'
 const EXPIRES_TOKEN = 'jwt-expire'
 const USERID_KEY = 'user-local-id'
 
-export const setTokens = ({idToken, refreshToken, localId, expiresIn}) => {
+export const setTokens = ({accessToken, refreshToken, userId, expiresIn}) => {
   const expiresDate = new Date().getTime() + expiresIn * 1000
-  localStorage.setItem(TOKEN_ID, idToken)
+  localStorage.setItem(TOKEN_ID, accessToken)
   localStorage.setItem(REFRESH_TOKEN, refreshToken)
   localStorage.setItem(EXPIRES_TOKEN, expiresDate)
-  localStorage.setItem(USERID_KEY, localId)
+  localStorage.setItem(USERID_KEY, userId)
 }
 
 export const removeAuthData = () => {

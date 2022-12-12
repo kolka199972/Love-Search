@@ -4,7 +4,6 @@ import localStorageService from '../services/localStorageService'
 import userService from '../services/userService'
 import {generateAuthError} from '../utils/generateAuthError'
 import history from '../utils/history'
-import {randomInt} from '../utils/randomInt'
 
 const initialState = localStorageService.getAccessToken()
   ? {
@@ -77,26 +76,12 @@ const {
   usersRequestFailed,
   authRequestSuccess,
   authRequestFailed,
-  userCreated,
   userLoggedOut,
   userUpdateSuccessed,
   authRequested
 } = actions
-const userCreateRequested = createAction('users/userCreateRequested')
-const createUserFailed = createAction('users/createUserFailed')
 const userUpdateFailed = createAction('users/userUpdateFailed')
 const userUpdateRequested = createAction('users/userUpdateRequested')
-
-const createUser = (payload) => async (dispatch) => {
-  dispatch(userCreateRequested())
-  try {
-    const {content} = await userService.create(payload)
-    dispatch(userCreated(content))
-    history.push('/users')
-  } catch (error) {
-    dispatch(createUserFailed(error.message))
-  }
-}
 
 export const loadUsersList = () => async (dispatch) => {
   dispatch(usersRequested())
@@ -119,32 +104,17 @@ export const updateUserData = (payload) => async (dispatch) => {
   }
 }
 
-export const signUp =
-  ({email, password, ...rest}) =>
-  async (dispatch) => {
-    dispatch(authRequested())
-    try {
-      const data = await authService.register({email, password})
-      localStorageService.setTokens(data)
-      dispatch(authRequestSuccess({userId: data.localId}))
-      dispatch(
-        createUser({
-          _id: data.localId,
-          rate: randomInt(0, 5),
-          completedMeetings: randomInt(0, 200),
-          email,
-          image: `https://avatars.dicebear.com/api/avataaars/${(
-            Math.random() + 1
-          )
-            .toString(36)
-            .substring(7)}.svg`,
-          ...rest
-        })
-      )
-    } catch (error) {
-      dispatch(authRequestFailed(error.message))
-    }
+export const signUp = (payload) => async (dispatch) => {
+  dispatch(authRequested())
+  try {
+    const data = await authService.register(payload)
+    localStorageService.setTokens(data)
+    dispatch(authRequestSuccess({userId: data.userId}))
+    history.push('/users')
+  } catch (error) {
+    dispatch(authRequestFailed(error.message))
   }
+}
 
 export const login =
   ({payload, redirect}) =>
@@ -153,8 +123,8 @@ export const login =
     dispatch(authRequested())
     try {
       const data = await authService.login({email, password})
-      dispatch(authRequestSuccess({userId: data.localId}))
       localStorageService.setTokens(data)
+      dispatch(authRequestSuccess({userId: data.userId}))
       history.push(redirect)
     } catch (error) {
       const {code, message} = error.response.data.error
